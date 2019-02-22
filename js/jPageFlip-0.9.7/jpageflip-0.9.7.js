@@ -1259,7 +1259,7 @@
                 }
                 // Calcule la posición relativa del mouse (se necesita nuevo valor de y, si mira en la esquina nuevamente sin mouseMove)
                 base.calcRelMousePos();
-                base.debugDraw();
+                //base.debugDraw();
             }
         }
 
@@ -1368,11 +1368,11 @@
 
         function debugValue() {
             // resultado de la depuración
-            $('#debug01').val(CX);
-            $('#debug02').val(CY);
-            $('#debug03').val(T2X);
-            $('#debug04').val(flipImage.length - 1);
-            $('#debug05').val(angleClip);
+            //$('#debug01').val(CX);
+            //$('#debug02').val(CY);
+            //$('#debug03').val(T2X);
+            //$('#debug04').val(flipImage.length - 1);
+            //$('#debug05').val(angleClip);
         }
         //#endregion
 
