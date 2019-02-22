@@ -1,0 +1,220 @@
+﻿<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>jPageFlip</title>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=no">
+        <meta name="language" content="es">
+        <meta name="description" content="jPageFlip - jQuery Plugin para simular el cambio de página">
+        <meta name="robots" content="index,follow" />
+        <meta name="keywords" content="jQuery, pageflip, jpageflip, jqueryplugin, flippingbook" />
+        
+        <!--*************************************************************************************************************-->
+        <!--*************************************************************************************************************-->
+        <!--*************************************************************************************************************-->
+        <!--Estilos del Plugin jPageFlip-->
+        <link type="text/css" href="js/jPageFlip-0.9.7/css/style.css" rel="stylesheet" />
+
+        <!--EStos son necesarios para el loader...-->
+        <!--<link rel="stylesheet" type="text/css" href="js/jPageFlip-0.9.7/loader/plugin.css">-->
+
+
+        <!--*************************************************************************************************************-->
+
+        <!--Librerias versiones de JQuery-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <!--<script type="text/javascript" src="js/JQuery/jquery-3.3.1.min.js"></script>-->
+
+        <!-- Libreria que gestiona el loader progresion.%-->
+        <!--<script src="js/jPageFlip-0.9.7/loader/plugin.js"></script>
+        <script src="js/jPageFlip-0.9.7/loader/script.js"></script>-->
+
+        <!--Libreria que gestiona archivos tipo PDF-->
+        <script type="text/javascript" src="js/jPageFlip-0.9.7/pdfjs-2.1.230-dist/pdf.js"></script>           
+        <script type="text/javascript" src="js/jPageFlip-0.9.7/pdfjs-2.1.230-dist/pdf.worker.js"></script>
+        
+        <!--Libreria que gestiona Sonido y Video jPlayer-2.9.2 que aun tengo que investigar....-->
+        <!--<script type="text/javascript" src="/js/jPageFlip-0.9.7/jPlayer-2.9.2/dist/jplayer/jquery.jplayer.min.js"></script>-->
+
+        <!--Libreria que gestiona el efecto ZOOM-->
+        
+
+        <!--Libreria que gestiona el efecto Libro-->
+        <script type="text/javascript" src="js/jPageFlip-0.9.7/Utiles.js"></script>
+        <script type="text/javascript" src="js/jPageFlip-0.9.7/jpageflip-0.9.7.js"></script>
+        <!--*************************************************************************************************************-->
+        <!--*************************************************************************************************************-->
+        <!--*************************************************************************************************************-->
+        
+        
+    </head>
+
+    <body>
+        
+        <div class="contenedor_Libro">
+            <!--Aqui visualiza el loader de progresion..-->
+            <!--<div id="loader" class="loader">
+            <div class="row">
+                <div class="col-sm-4 col-sm-offset-4">
+                    <div class="my-progress-bar"></div>
+                </div>
+            </div>
+        </div>-->
+            <!--Aqui carga el Libro-->
+            <div id="myPageFlip">
+            </div>
+        </div>
+        
+    </body>
+</html>
+
+
+
+
+
+<!--Se encarga de convertir el documento PDF a imagenes, que despues jPageFlip será capaz de procesar.-->
+<script type="text/javascript">
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // Cuando la pagina ha sido leida entonces llama a la funcion pageIsLoaded()
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    window.onload = pageIsLoaded();
+    
+
+    // ++++++++++++++++++++++++++++++
+    // Es llamada al leer la ventana
+    // ++++++++++++++++++++++++++++++
+    function pageIsLoaded() {
+
+        //var url = '';
+        var url = 'media/documentos/BOE-A-2014-3649.pdf';
+        
+        if (url.length > 0) {
+            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+            pdfjsLib.disableWorker = false;            
+
+            // Recuperamos el documento PDF.        
+            var loadingTask = pdfjsLib.getDocument(url);
+            
+
+            // Esperamos recuperar el documento en un proceso Asincrono...
+            loadingTask.promise.then(function (pdf) {
+
+                console.log("Archivo leido correctamente...");
+
+                numeroPaginas = pdf.numPages;
+                var x = 1;
+
+                LeerPagina(pdf, numeroPaginas, x); // --- Primera Lectura del Libro en la primera hoja.
+
+                // +++++++++++++++++++++++++++++++++++++
+                // Leemos la pagina X del documento pdf
+                // +++++++++++++++++++++++++++++++++++++
+                function LeerPagina(pdf, numeroPaginas, x) {
+
+                    // Creamos un lienzo donde recibir la pagina.
+                    var canvas = null;
+                    canvas = document.createElement("canvas");
+                    canvas.id = "the-canvas" + x;
+                    var context = canvas.getContext('2d');
+
+                    //No añadimos nada para acelerar el proceso...    
+                    //document.body.appendChild(canvas);
+                    //document.body.insertBefore(canvas, document.body.childNodes[x]);
+
+                    // Solicitamos la pagina X y la devuelve en page...
+                    pdf.getPage(x).then(function (page) {
+
+                        var viewport = page.getViewport({ scale: 1.5 }); 
+
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+
+                        // Definidos los parametros anteriores que determinan como se verá la pagina, procedemos
+                        // a renderizarla lo que significa que una pagina del pdf se depositará en el canvas.
+                        renderPagina(renderContext, canvas, page, numeroPaginas, x);
+
+                    });
+
+                    // -------------------------------------------------------------------------------------
+
+                    function renderPagina(renderContext, canvas, page, numeroPaginas, x) {
+
+                        var pageRendering = page.render(renderContext);
+                        var completeCallback = pageRendering._internalRenderTask.callback;
+
+                        pageRendering._internalRenderTask.callback = function (error) {
+
+                            var image = new Image();
+                            var dataUrl = canvas.toDataURL("images/jpeg", 1.5);
+                            image.id = x;
+                            image.src = dataUrl;
+                            image.className = "jPageFlip ocultar";
+
+                            // Creamos en el código un elemento <img>
+                            document.getElementById('myPageFlip').insertBefore(image, document.getElementById('myPageFlip').childNodes[x]);
+
+                            // Otra forma de insertar la nueva pagina...
+                            //var nuevaPagina = '<img class="jPageFlip" src="' + image.src + '"/>';
+                            //document.getElementById('myPageFlip').insertBefore(nuevaPagina, document.getElementById('myPageFlip').childNodes[3]);
+
+                            completeCallback.call(this, error);
+
+                            console.log("Todas las paginas Renderizadas");
+
+                            if (x <= numeroPaginas - 1) { //numeroPaginas - 1
+                                x++;
+                                LeerPagina(pdf, numeroPaginas, x); // ---- Sucesivas lecturas llamandose a si mismo...
+
+                            } else {
+                                x--;
+                                AplicarLibro();
+                            }
+
+                        }, function (error) {
+                            console.log(reason);
+                        };
+                    }
+                }
+
+            }, function (reason) {
+                // PDF loading error
+                console.error(reason);
+            });
+        } else {
+            AplicarLibro();
+        }
+    }
+
+    // +++++++++++++++++++++++++++++++++++
+    // Carga el efecto libro (jPageFlip).
+    // +++++++++++++++++++++++++++++++++++
+    function AplicarLibro() {
+        $('#myPageFlip').jPageFlip({
+            width: 446, //892,
+            height: 631, //1262,
+            top: 0,
+            left: 0,
+            startPage: 1,
+            pageAnimation: true,
+            animationSpeed: 20,
+            animationDynamic: 40,
+            shadowWidth: 10,
+            shadowOpacity: 0.5,
+            showCorner: false,
+            cornerSize: 100,
+            cornerColor: '#grey',
+            cornerAlpha: 0.15,
+            flipOnClick: true
+        });
+    }
+</script>

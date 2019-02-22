@@ -1,2 +1,0 @@
-# jpageFlip
-Añadiendo nuevas funcionalidades
