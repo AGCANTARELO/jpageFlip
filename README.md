@@ -16,19 +16,6 @@ Por el momento he añadir la posibilidad de leer documentos PDF y mostrarlos uti
 El tratamiento de archivos PDF se realiza desde Pdf.js.
 
 
-
-### Otras funcionalidades PENDIENTES de añadir
-
-   * Debe permitir pasar las paginas pulsando las teclas de fechas a derecha e izquierda.
-   * Debe permitir hacer Zoom del libro utilizando la ruleta del raton o las teclas arriba & abajo.
-   * Debe permitir pasar paginas haciendo click en las esquinas superiores de la pagina con el efecto adecuado.
-   * Debe permitir ir a una pagina concreta introducida por el usuario "Ir a..."
-   * Debe permitir Imprimir una pagina o varias.
-   * Debe permitir Descargar el archivo PDF en el ordenador local.
-   * Seria muy interesante disponer de un Roll de paginas para poder seleccionar la pagina a la que ir
-   * Debe mostrar un loader mientras se produce la carga de las paginas.
-   * Debe hacer un sonido al pasar la pagina.
-
 ## Actualizaciones
 
 * **2019-02-16** - Ahora si que ya pasa las paginas. Faltas ajustar milimetricamente para que no se perciba el click al seleccionar
