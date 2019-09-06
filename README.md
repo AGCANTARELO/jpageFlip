@@ -1,5 +1,7 @@
 # jpageFlip
-Añadir nuevas funcionalidades a jPageFlip
+Añadir nuevas funcionalidades a jPageFlip 0.9.7.
+Este programa hacia el efecto hoja de libro para mostrar un album de fotografias. 
+Ahora he sustituido las fotografias por documentos PDF de textos.
 
 ### Objetivo
 
